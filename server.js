@@ -15,8 +15,20 @@ let score_P1 = 50;
 let score_P2 = 50;
 let players = {}
 
-let x = Math.random() * 450 + "px";
-let y = Math.random() * 450 + "px";
+let n_targets = 3;
+let x = [];
+let y = [];
+
+// define posicao aleatoria dos targets
+function target_position() {
+    for (var i=0; i<n_targets; i++) {
+        x[i] = Math.random() * 450 + "px";
+        y[i] = Math.random() * 450 + "px";
+    }
+}
+target_position();
+
+
 
 // o método 'on' ouve esse evento
 // connection dispara sempre que um jogador se conecta
@@ -32,17 +44,16 @@ io.on('connection', (socket) => {
     currentPlayer = currentPlayer === 1 ? 2 : 1;
 
     // emite coordenadas
-    socket.emit('game', x, y, 50, 50);
+    socket.emit('game', x, y, n_targets, 50, 50);
 
     // listener
     socket.on('move', () => {
         console.log(currentPlayer);
         console.log(players[socket.id]);
 
-
+        // atualiza posicoes dos targets
         io.emit('remove_target');
-        x = Math.random() * 450 + "px";
-        y = Math.random() * 450 + "px";
+        target_position();
         
         // atualiza scores
         if (players[socket.id] == 1) {
@@ -53,7 +64,7 @@ io.on('connection', (socket) => {
             score_P1--;
             score_P2++;
         }
-        io.emit('game', x, y, score_P1, score_P2);
+        io.emit('game', x, y, n_targets, score_P1, score_P2);
       });
 
 

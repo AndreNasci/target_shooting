@@ -3,41 +3,56 @@ const socket = io();
 
 
 
-
-
-
-
 // score do jogador
 let score = 0;
+let flag = 0;
+let targets = []
+let n_targets;
 
 // listener 
 // 'game' é emitido ao inicio do jogo
 // e sempre que um jogador clica em um target
-socket.on('game', (x, y, p1, p2) => {
+socket.on('game', (x, y, n, p1, p2) => {
+    
+    // Define numero de targets
+    n_targets = n;
+
 
     function createTarget() {
-        //cria div para cada target
-        let target = document.createElement("div");
-        // adiciona classe target ao elemento
-        target.classList.add("target");
-
+   
+        // cria div para cada target
+        // adiciona classe 'target' ao elemento
         // define posicao
-        target.style.top = y;
-        target.style.left = x;
+        for (var i=0; i<n_targets; i++) {
+            targets[i] = document.createElement("div");
+            targets[i].classList.add("target");
+            targets[i].style.top = y[i];
+            targets[i].style.left = x[i];
+        }
+
         document.getElementById("p1").textContent = p1;
         document.getElementById("p2").textContent = p2;
 
-        target.addEventListener("click", function() {
-            score++;
-            document.getElementById("score").textContent = score;
-            socket.emit('move');
-        });
-        
+        // adiciona listeners aos targets
+        for(var i=0; i<n_targets; i++) {
+            targets[i].addEventListener("click", function() {
+                score++;
+                document.getElementById("score").textContent = score;
+                socket.emit('move');
+            });
+        }
+
+        // remove target do jogo
         socket.on('remove_target', () => {
-            target.remove();
+            for (var i=0; i<n_targets; i++) {
+                targets[i].remove();
+            }
         });
 
-        document.getElementById("game").appendChild(target);
+
+        for (var i=0; i<n_targets; i++) {
+            document.getElementById("game").appendChild(targets[i]);
+        }
     }
 
     createTarget();
