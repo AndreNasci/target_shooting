@@ -14,6 +14,7 @@ let currentPlayer = 1;
 let score_P1 = 50;
 let score_P2 = 50;
 let players = {}
+let p_sockets = []
 
 let n_targets = 3;
 let x = [];
@@ -37,7 +38,8 @@ io.on('connection', (socket) => {
 
     // usa id do socket como chave para o jogador
     players[socket.id] = currentPlayer;
-    //player_count++;
+    p_sockets[currentPlayer] = socket;
+
 
     // operador ternario (alterna simbolos)
     // proximo player que se conectar terá outro simbolo
@@ -64,7 +66,14 @@ io.on('connection', (socket) => {
             score_P1--;
             score_P2++;
         }
-        io.emit('game', x, y, n_targets, score_P1, score_P2);
+
+        if (score_P1 == 70 || score_P2 == 70) {
+            p_sockets[1].emit('win');
+            p_sockets[2].emit('lose');
+        }
+        else {
+            io.emit('game', x, y, n_targets, score_P1, score_P2);
+        }
       });
 
 
@@ -77,7 +86,7 @@ io.on('connection', (socket) => {
     });
 });
 
-http.listen(3000, () => {
+http.listen(3001, () => {
 console.log('listening on *:3000');
 });
   

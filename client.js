@@ -57,4 +57,14 @@ socket.on('game', (x, y, n, p1, p2) => {
 
     createTarget();
 
+    socket.on('win', () => {
+        document.getElementById("p1").textContent = 100;
+        document.getElementById("p2").textContent = 0;
+    });
+
+    socket.on('lose', () => {
+        document.getElementById("p1").textContent = 0;
+        document.getElementById("p2").textContent = 100;
+    });
+
 });
